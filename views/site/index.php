@@ -4,6 +4,25 @@
 
 $this->title = 'My Yii Application';
 ?>
+
+
+<?php
+use yii\helpers\Html;
+use yii\widgets\LinkPager;
+?>
+<h1>Users</h1>
+<ul>
+<?php foreach ($users as $user): ?>
+    <li>
+        <?= Html::encode("{$user->login} ({$user->name})") ?>:
+        <?= $user->email ?>
+    </li>
+<?php endforeach; ?>
+</ul>
+
+<?= LinkPager::widget(['pagination' => $pagination]) ?>
+
+
 <div class="site-index">
 
     <div class="jumbotron text-center bg-transparent mt-5 mb-5">

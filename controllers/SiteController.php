@@ -9,6 +9,8 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\User;
+use yii\data\Pagination;
 
 class SiteController extends Controller
 {
@@ -61,7 +63,23 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+
+        $query = User::find();
+
+        $pagination = new Pagination([
+            'defaultPageSize' => 5,
+            'totalCount' => $query->count(),
+        ]);
+
+        $users = $query->orderBy('name')
+            ->offset($pagination->offset)
+            ->limit($pagination->limit)
+            ->all();
+
+            return $this->render('index', [
+                'users' => $users,
+                'pagination' => $pagination,
+            ]);
     }
 
     /**
@@ -70,6 +88,24 @@ class SiteController extends Controller
      * @return Response|string
      */
     public function actionLogin()
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new LoginForm();
+        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            return $this->goBack();
+        }
+
+        $model->password = '';
+        return $this->render('login', [
+            'model' => $model,
+        ]);
+    }
+
+
+    public function actionRegistration()
     {
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
